@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 700">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#dcfce7"/>
+        <stop offset="1" stop-color="#ffffff"/>
+      </linearGradient>
+      <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="14" stdDeviation="18" flood-opacity=".12"/>
+      </filter>
+    </defs>
+    <rect width="700" height="700" rx="36" fill="url(#bg)"/>
+    <text x="350" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#1f2937">Canvas Backpack</text>
+    <text x="350" y="658" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#6b7280">Bags</text>
+    <g filter="url(#shadow)">
+          <rect x="190" y="205" width="320" height="330" rx="45" fill="#6b7280"/>
+          <path d="M250 215 C250 90 450 90 450 215" fill="none" stroke="#374151" stroke-width="55" stroke-linecap="round"/>
+          <path d="M225 300 H475" stroke="#9ca3af" stroke-width="12"/>
+          <rect x="285" y="330" width="130" height="90" rx="16" fill="#4b5563"/>
+        </g></svg>

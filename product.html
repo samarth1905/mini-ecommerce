@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - MiniStore</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container nav">
+            <a href="index.html" class="logo">MiniStore</a>
+            <a href="index.html" class="back-link">← Back to Store</a>
+            <button class="cart-btn" id="cartBtn">Cart <span id="cartCount">0</span></button>
+        </div>
+    </header>
+
+    <main class="product-details-section">
+        <div class="container">
+            <div id="detailsLoading" class="message">Loading product...</div>
+            <div id="detailsError" class="message error-message">Unable to load product.</div>
+
+            <div id="productDetails" class="product-details">
+                <div class="details-image">
+                    <img id="productImage" src="" alt="Product">
+                </div>
+                <div class="details-content">
+                    <span id="productCategory" class="category"></span>
+                    <h1 id="productName"></h1>
+                    <div class="rating">★ <span id="productRating"></span></div>
+                    <p id="productDescription"></p>
+                    <div class="details-price">₹<span id="productPrice"></span></div>
+
+                    <div class="quantity-box">
+                        <button id="decreaseQty">−</button>
+                        <span id="productQuantity">1</span>
+                        <button id="increaseQty">+</button>
+                    </div>
+
+                    <button id="addToCart" class="add-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/cart.js"></script>
+    <script src="js/product-details.js"></script>
+</body>
+</html>
