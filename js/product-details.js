@@ -15,20 +15,27 @@ async function loadProduct() {
     }
 
     try {
-        const response = await fetch(`${API_URL}/${productId}`);
+        const response = await fetch("data/products.json");
 
         if (!response.ok) {
+            throw new Error("Local product data unavailable");
+        }
+
+        const products = await response.json();
+
+        currentProduct = products.find(
+            product => String(product.id) === String(productId)
+        );
+
+        if (!currentProduct) {
             throw new Error("Product not found");
         }
 
-        currentProduct = await response.json();
-
-        // Keep the product image local for a reliable demo.
-        const imageNumber = Number(productId);
-        currentProduct.image = `images/product-${imageNumber}.svg`;
-
         displayProduct(currentProduct);
+
     } catch (error) {
+        console.error("Local product data failed:", error);
+
         const localProduct = LOCAL_PRODUCTS.find(
             product => String(product.id) === String(productId)
         );
@@ -42,6 +49,7 @@ async function loadProduct() {
         displayProduct(currentProduct);
     }
 }
+
 
 function displayProduct(product) {
     detailsLoading.style.display = "none";
