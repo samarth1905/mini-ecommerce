@@ -15,6 +15,37 @@ const clearFilters = document.getElementById("clearFilters");
 async function loadProducts() {
     showState("loading");
 
+    // MAIN STORE: use our own local products
+    try {
+        const localResponse = await fetch("data/products.json");
+
+        if (!localResponse.ok) {
+            throw new Error("Local product data unavailable");
+        }
+
+        products = await localResponse.json();
+
+        filteredProducts = [...products];
+        createCategories();
+        displayProducts(filteredProducts);
+        showState("products");
+
+        console.log("Local products loaded:", products);
+
+    } catch (localError) {
+        console.error("Local products failed:", localError);
+
+        // Hardcoded local fallback
+        products = getFallbackProducts();
+
+        filteredProducts = [...products];
+        createCategories();
+        displayProducts(filteredProducts);
+        showState("products");
+    }
+
+    // PUBLIC API: separate integration check.
+    // The API never replaces the main store products.
     try {
         const response = await fetch(API_URL);
 
@@ -24,37 +55,17 @@ async function loadProducts() {
 
         const apiProducts = await response.json();
 
-        // Use 15 products from the API and attach our local product images.
-        products = apiProducts.slice(0, 15).map((product, index) => ({
-            ...product,
-            image: `images/product-${index + 1}.svg`
-        }));
+        console.log(
+            "API connected successfully:",
+            apiProducts.length,
+            "external products"
+        );
 
-        filteredProducts = [...products];
-        createCategories();
-        displayProducts(filteredProducts);
-        showState("products");
-    } catch (err) {
-        try {
-            const localResponse = await fetch("data/products.json");
-
-            if (!localResponse.ok) {
-                throw new Error("Local data unavailable");
-            }
-
-            products = await localResponse.json();
-            filteredProducts = [...products];
-            createCategories();
-            displayProducts(filteredProducts);
-            showState("products");
-        } catch (localError) {
-            // This fallback also works if index.html is opened without a local server.
-            products = getFallbackProducts();
-            filteredProducts = [...products];
-            createCategories();
-            displayProducts(filteredProducts);
-            showState("products");
-        }
+    } catch (apiError) {
+        console.warn(
+            "External API unavailable. Local store continues normally.",
+            apiError
+        );
     }
 }
 
