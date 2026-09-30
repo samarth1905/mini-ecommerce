@@ -15,7 +15,7 @@ const clearFilters = document.getElementById("clearFilters");
 async function loadProducts() {
     showState("loading");
 
-    // MAIN STORE: use our own local products
+    // MAIN STORE: load our own products first
     try {
         const localResponse = await fetch("data/products.json");
 
@@ -30,12 +30,11 @@ async function loadProducts() {
         displayProducts(filteredProducts);
         showState("products");
 
-        console.log("Local products loaded:", products);
+        console.log("LOCAL PRODUCTS LOADED:", products);
 
     } catch (localError) {
         console.error("Local products failed:", localError);
 
-        // Hardcoded local fallback
         products = getFallbackProducts();
 
         filteredProducts = [...products];
@@ -44,8 +43,7 @@ async function loadProducts() {
         showState("products");
     }
 
-    // PUBLIC API: separate integration check.
-    // The API never replaces the main store products.
+    // API integration — does NOT replace our local products
     try {
         const response = await fetch(API_URL);
 
@@ -56,14 +54,14 @@ async function loadProducts() {
         const apiProducts = await response.json();
 
         console.log(
-            "API connected successfully:",
+            "API CONNECTED:",
             apiProducts.length,
             "external products"
         );
 
     } catch (apiError) {
         console.warn(
-            "External API unavailable. Local store continues normally.",
+            "API unavailable. Local products continue.",
             apiError
         );
     }
