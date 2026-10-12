@@ -1,5 +1,4 @@
-const API_URL = "https://fakestoreapi.com/products";
-
+const API_URL = "http://localhost:5000/api/products";
 let products = [];
 let filteredProducts = [];
 
@@ -15,7 +14,65 @@ const clearFilters = document.getElementById("clearFilters");
 async function loadProducts() {
     showState("loading");
 
-    // MAIN STORE: load our own products first
+    try {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+            throw new Error(`Backend request failed: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // Backend response is paginated; products are in result.data.
+        let apiProducts = Array.isArray(result) ? result : result.data;
+
+        if (!Array.isArray(apiProducts)) {
+            throw new Error("Invalid products response from backend");
+        }
+
+        // Fetch remaining pages so the storefront can show all products.
+        if (!Array.isArray(result) && result.pages > 1) {
+            const pageRequests = [];
+            for (let page = 2; page <= result.pages; page++) {
+                pageRequests.push(
+                    fetch(`${API_URL}?page=${page}`).then(pageResponse => {
+                        if (!pageResponse.ok) {
+                            throw new Error(`Backend page ${page} failed: ${pageResponse.status}`);
+                        }
+                        return pageResponse.json();
+                    })
+                );
+            }
+
+            const pageResults = await Promise.all(pageRequests);
+            for (const pageResult of pageResults) {
+                const pageProducts = Array.isArray(pageResult) ? pageResult : pageResult.data;
+                if (!Array.isArray(pageProducts)) {
+                    throw new Error("Invalid paginated products response");
+                }
+                apiProducts = apiProducts.concat(pageProducts);
+            }
+        }
+
+        if (apiProducts.length > 0) {
+            products = apiProducts;
+            console.log("MONGODB PRODUCTS LOADED:", products.length);
+        } else {
+            console.warn("MongoDB returned no products; loading local demo products.");
+            products = await loadLocalProducts();
+        }
+    } catch (apiError) {
+        console.error("Backend API failed:", apiError);
+        console.warn("Loading local products as a fallback.");
+        products = await loadLocalProducts();
+    }
+
+    filteredProducts = [...products];
+    createCategories();
+    displayProducts(filteredProducts);
+}
+
+async function loadLocalProducts() {
     try {
         const localResponse = await fetch("data/products.json");
 
@@ -23,47 +80,10 @@ async function loadProducts() {
             throw new Error("Local product data unavailable");
         }
 
-        products = await localResponse.json();
-
-        filteredProducts = [...products];
-        createCategories();
-        displayProducts(filteredProducts);
-        showState("products");
-
-        console.log("LOCAL PRODUCTS LOADED:", products);
-
+        return await localResponse.json();
     } catch (localError) {
-        console.error("Local products failed:", localError);
-
-        products = getFallbackProducts();
-
-        filteredProducts = [...products];
-        createCategories();
-        displayProducts(filteredProducts);
-        showState("products");
-    }
-
-    // API integration — does NOT replace our local products
-    try {
-        const response = await fetch(API_URL);
-
-        if (!response.ok) {
-            throw new Error("API request failed");
-        }
-
-        const apiProducts = await response.json();
-
-        console.log(
-            "API CONNECTED:",
-            apiProducts.length,
-            "external products"
-        );
-
-    } catch (apiError) {
-        console.warn(
-            "API unavailable. Local products continue.",
-            apiError
-        );
+        console.warn("Local products unavailable; using built-in demo products.", localError);
+        return getFallbackProducts();
     }
 }
 
