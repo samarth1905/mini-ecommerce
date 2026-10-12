@@ -18,7 +18,7 @@ app.use('/api', requestLogger, routes);
 app.use('/api', notFound);
 
 // Serve the frontend from the same server (no CORS needed this way)
-app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
+app.use(express.static(path.join(__dirname, '..', '..')));
 
 app.use(errorHandler);
 
